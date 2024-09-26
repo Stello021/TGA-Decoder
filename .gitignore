@@ -4,3 +4,5 @@
 
 /.vs/TGAReader
 *.sln
+/.vs
+*.vcxproj
