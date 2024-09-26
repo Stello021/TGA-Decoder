@@ -5,6 +5,6 @@
 /.vs/TGAReader
 *.sln
 /.vs
-*.vcxproj
 /TGAReader/TGAReader.vcxproj.filters
 /TGAReader/TGAReader.vcxproj.user
+/TGAReader/TGAReader.vcxproj
