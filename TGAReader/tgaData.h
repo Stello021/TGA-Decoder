@@ -1,22 +1,22 @@
 #pragma once
-#include "Common.h"
+#include <cstdint>
 
 struct TGAHeader
 {
-	int8 IdLength;
-	int8 ColorMapType;
-	int8 ImageType;
+	int8_t IdLength;
+	int8_t ColorMapType;
+	int8_t ImageType;
 	//Color map specification
-	int16 FirstEntryIndex;
-	int16 ColorMapLength;
-	int8 ColorMapDepth; //number of bits per color map entry
+	int16_t FirstEntryIndex;
+	int16_t ColorMapLength;
+	int8_t ColorMapDepth; //number of bits per color map entry
 	//Image specification
-	int16 OriginX;
-	int16 OriginY;
-	int16 ImageWidth;
-	int16 ImageHeigth;
-	int8 PixelDepth;
-	int8 ImageDescriptor;
+	int16_t OriginX;
+	int16_t OriginY;
+	int16_t ImageWidth;
+	int16_t ImageHeigth;
+	int8_t PixelDepth; //in bits
+	int8_t ImageDescriptor;
 };
 
 struct TGAColor
@@ -25,19 +25,19 @@ struct TGAColor
 	{
 		struct
 		{
-			uint8 R, G, B, A;
+			uint8_t R, G, B, A;
 		};
-		uint8 Raw[4];
-		uint32 Value;
+		uint8_t Raw[4];
+		uint32_t Value;
 	};
-	int32 BytesPerPixel;
+	int32_t BytesPerPixel;
 
 	TGAColor() : Value(0), BytesPerPixel(1)
 	{
 
 	}
 
-	TGAColor(uint8 r, uint8 g, uint8 b, uint8 a) : R(r), G(g), B(b), A(a), BytesPerPixel(4)
+	TGAColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a) : R(r), G(g), B(b), A(a), BytesPerPixel(4)
 	{
 
 	}
@@ -47,7 +47,7 @@ struct TGAColor
 
 	}
 
-	TGAColor(const uint8* p, int bytesPerPixel) : Value(0), BytesPerPixel(bytesPerPixel)
+	TGAColor(const uint8_t* p, int bytesPerPixel) : Value(0), BytesPerPixel(bytesPerPixel)
 	{
 		for (int i = 0; i < bytesPerPixel; i++)
 		{
