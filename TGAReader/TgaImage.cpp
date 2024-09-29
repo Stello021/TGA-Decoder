@@ -20,7 +20,6 @@ TGAImage::TGAImage(const TGAImage& img) : width(img.width), height(img.height), 
 {
 }
 
-
 TGAImage::~TGAImage()
 {
 }
@@ -35,6 +34,21 @@ TGAImage& TGAImage::operator=(const TGAImage& img)
 		data = img.data;
 	}
 	return *this;
+}
+
+int TGAImage::GetWidth() const
+{
+	return width;
+}
+
+int TGAImage::GetHeigth() const
+{
+	return height;
+}
+
+int TGAImage::GetBytesPerPixel() const
+{
+	return bytesPerPixel;
 }
 
 bool TGAImage::ReadTGAFile(const std::string filename)
@@ -123,7 +137,7 @@ bool TGAImage::ReadTGAFile(const std::string filename)
 
 bool TGAImage::LoadRLEData(std::ifstream& in)
 {
-	uint32_t pixelCount = width * height;
+	 const uint32_t pixelCount = width * height;
 	uint32_t currentPixel = 0;
 	uint32_t currentByte = 0;
 	TGAColor colorBuffer;
@@ -269,7 +283,7 @@ bool TGAImage::CompressRawData(std::ofstream& out)
 {
 	//identifies sequences of consecutive pixels that have same color and encodes them as a "run",
 	// storing color once followed by the number of consecutive pixels
-	uint32_t pixelCount = width * height;
+	const uint32_t pixelCount = width * height;
 	uint32_t currentPixel = 0;
 
 	while (currentPixel < pixelCount)
@@ -317,5 +331,67 @@ bool TGAImage::CompressRawData(std::ofstream& out)
 			return false;
 		}
 	}
+	return true;
+}
+
+TGAColor TGAImage::GetColor( const int x, const int y) const
+{
+	if (data.empty() || x < 0 || y < 0 || x >= width || y >= height)
+	{
+		return TGAColor();
+	}
+	return TGAColor(data.data() + (x + y * width) * bytesPerPixel, bytesPerPixel);
+}
+
+bool TGAImage::SetColor(const int x, const int y, const TGAColor color)
+{
+	if (data.empty() || x < 0 || y < 0 || x >= width || y >= height)
+	{
+		return false;
+	}
+	memcpy(data.data() + (x + y * width) * bytesPerPixel, color.Raw, bytesPerPixel);
+	return true;
+}
+
+bool TGAImage::FlipHorizontally()
+{
+	if (data.empty())
+	{
+		return false;
+	}
+
+	for (int i = 0; i < width >> 1; i++)
+	{
+		for (int j = 0; j < height; j++)
+		{
+			const TGAColor c1 = GetColor(i, j);
+			const TGAColor c2 = GetColor(width - 1 - i, j);
+			SetColor(i, j, c2);
+			SetColor(width - 1 - i, j, c1);
+		}
+	}
+	return true;
+}
+
+bool TGAImage::FlipVertically()
+{
+	if (data.empty())
+	{
+		return false;
+	}
+
+	const uint32_t bytesPerLine = width * bytesPerPixel;
+	uint8_t* line = new uint8_t[bytesPerLine];
+
+	for (int i = 0; i < width >> 1; i++)
+	{
+		const unsigned long l1 = i * bytesPerLine;
+		const unsigned long l2 = (height - 1 - i) * bytesPerLine;
+		memmove((void*)line, (void*)(data.data() + l1), bytesPerLine);
+		memmove((void*)(data.data() + l1), (void*)(data.data() + l2), bytesPerLine);
+		memmove((void*)(data.data() + l2), (void*)line, bytesPerLine);
+	}
+
+	delete [] line;
 	return true;
 }

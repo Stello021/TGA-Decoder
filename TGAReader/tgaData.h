@@ -60,7 +60,7 @@ struct TGAColor
 	}
 
 	//copy ctor
-	TGAColor(TGAColor &color) : Value(color.Value), BytesPerPixel(color.BytesPerPixel)
+	TGAColor(const TGAColor& color) : Value(color.Value), BytesPerPixel(color.BytesPerPixel)
 	{
 
 	}

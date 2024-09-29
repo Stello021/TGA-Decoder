@@ -50,16 +50,16 @@ public:
 	bool FlipVertically();
 	bool Scale(int w, int h);
 
-	TGAColor GetColor(int x, int y);
-	bool SetColor(int x, int y, TGAColor color);
+	TGAColor GetColor(const int x, const int y) const;
+	bool SetColor(const int x, const int y, const TGAColor color);
 
 	~TGAImage();
 
 	TGAImage& operator=(const TGAImage& img);
 
-	int GetWidth();
-	int GetHeigth();
-	int GetBytesPerPixel();
+	int GetWidth() const;
+	int GetHeigth() const;
+	int GetBytesPerPixel() const;
 
 	uint8_t* Buffer();
 	void Clear();
