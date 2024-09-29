@@ -24,13 +24,9 @@ protected:
 	bool LoadRLEData(std::ifstream& in);
 
 	/// <summary>
-	/// Unload image data stored on input file with RLE compression (lossless)
+	/// Compress the raw image data into RLE format and write it into an output file stream
 	/// </summary>
-	/// <param name="out">
-	/// -> Output file
-	/// </param>
-	/// <returns></returns>
-	bool UnloadRLEData(std::ofstream& out);
+	bool CompressRawData(std::ofstream& out);
 
 public:
 	enum Format

@@ -222,7 +222,7 @@ bool TGAImage::WriteTGAFile(const std::string filename, bool rle)
 
 	if (rle)
 	{
-		if (!UnloadRLEData(out))
+		if (!CompressRawData(out))
 		{
 			out.close();
 			std::cerr << "Fail to unload raw data\n";
@@ -265,8 +265,10 @@ bool TGAImage::WriteTGAFile(const std::string filename, bool rle)
 	return true;
 }
 
-bool TGAImage::UnloadRLEData(std::ofstream& out)
+bool TGAImage::CompressRawData(std::ofstream& out) 
 {
+	//identifies sequences of consecutive pixels that have same color and encodes them as a "run",
+	// storing color once followed by the number of consecutive pixels
 	uint32_t pixelCount = width * height;
 	uint32_t currentPixel = 0;
 
@@ -279,6 +281,7 @@ bool TGAImage::UnloadRLEData(std::ofstream& out)
 
 		while (currentPixel + run_length < pixelCount && run_length < MAX_CHUNK_LENGTH)
 		{
+			//Chunk construction
 			bool nextPixelIsEqual = true;
 			for (int i = 0; nextPixelIsEqual && i < bytesPerPixel; i++)
 			{
