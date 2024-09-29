@@ -120,6 +120,7 @@ bool TGAImage::ReadTGAFile(const std::string filename)
 	return true;
 }
 
+
 bool TGAImage::LoadRLEData(std::ifstream& in)
 {
 	uint32_t pixelCount = width * height;
@@ -186,5 +187,80 @@ bool TGAImage::LoadRLEData(std::ifstream& in)
 		}
 
 	} while (currentPixel < pixelCount);
+	return true;
+}
+
+bool TGAImage::WriteTGAFile(const std::string filename, bool rle)
+{
+	uint8_t developerArea[4] = { 0, 0, 0, 0 };
+	uint8_t extensionArea[4] = { 0, 0, 0, 0 };
+	uint8_t footer[18] = { 'T','R','U','E','V','I','S','I','O','N','-','X','F','I','L','E','.','\0' };
+
+	std::ofstream out;
+	out.open(filename, std::ios::binary);
+	if (!out.is_open())
+	{
+		std::cerr << "Can't open file " << filename << "\n";
+		out.close();
+		return false;
+	}
+
+	TGAHeader header;
+	memset(reinterpret_cast<void*>(&header), 0, sizeof(header));
+	header.PixelDepth = bytesPerPixel << 3;
+	header.ImageWidth = width;
+	header.ImageHeigth = height;
+	header.ImageType = (bytesPerPixel == GRAYSCALE ? (rle ? 11 : 3) : (rle ? 10 : 2));
+	header.ImageDescriptor = 0x20;
+	out.write(reinterpret_cast<char*>(& header), sizeof(header));
+	if (!out.good())
+	{
+		out.close();
+		std::cerr << "Fail to write the TGA file\n";
+		return false;
+	}
+
+	if (rle)
+	{
+		if (!UnloadRLEData(out))
+		{
+			out.close();
+			std::cerr << "Fail to unload raw data\n";
+			return false;
+		}
+	}
+	else
+	{
+		out.write(reinterpret_cast<char*>(data.data()), width * height * bytesPerPixel);
+		if (!out.good())
+		{
+			out.close();
+			std::cerr << "Fail to unload raw data\n";
+			return false;
+		}
+	}
+
+	out.write(reinterpret_cast<char*>(developerArea), sizeof(developerArea));
+	if (!out.good())
+	{
+		out.close();
+		std::cerr << "Fail to write the TGA file\n";
+		return false;
+	}
+	out.write(reinterpret_cast<char*>(extensionArea), sizeof(extensionArea));
+	if (!out.good())
+	{
+		out.close();
+		std::cerr << "Fail to write the TGA file\n";
+		return false;
+	}
+	out.write(reinterpret_cast<char*>(footer), sizeof(footer));
+	if (!out.good())
+	{
+		out.close();
+		std::cerr << "Fail to write the TGA file\n";
+		return false;
+	}
+	out.close();
 	return true;
 }
