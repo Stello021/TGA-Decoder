@@ -16,7 +16,10 @@ struct TGAHeader
 	int16_t ImageWidth;
 	int16_t ImageHeigth;
 	int8_t PixelDepth; //in bits
-	int8_t ImageDescriptor;
+	int8_t ImageDescriptor; 
+	//IMAGE DESCRIPTOR BITS DATA
+	//5th bit -> pixels ordered from left-to-right (1) or right-to-left (0)
+	//6th bit -> pixels ordered from top-to-bottom (1) or bottom-to-top (0)
 };
 
 struct TGAColor

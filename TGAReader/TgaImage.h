@@ -6,6 +6,8 @@
 #include <string>
 #include "TgaData.h"
 
+#define HALF_BITE_SIZE (sizeof(uint8_t) / 2)
+
 class TGAImage
 {
 protected:
