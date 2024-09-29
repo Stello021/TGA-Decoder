@@ -6,7 +6,7 @@
 #include <string>
 #include "TgaData.h"
 
-#define HALF_BITE_SIZE (sizeof(uint8_t) / 2)
+#define MAX_CHUNK_LENGTH 128
 
 class TGAImage
 {

@@ -2,7 +2,7 @@
 #include <cstdint>
 #include <memory>
 #include <fstream>
-#include<iostream>
+#include <iostream>
 #include "TgaData.h"
 
 
@@ -138,7 +138,7 @@ bool TGAImage::LoadRLEData(std::ifstream& in)
 			return false;
 		}
 		//chunks can contains raw data or RLE data
-		if (chunkHeader < HALF_BITE_SIZE) //chunk headers < 128 contains raw data of chunk header + 1 pixels 
+		if (chunkHeader < MAX_CHUNK_LENGTH) //chunk headers < 128 contains raw data of chunk header + 1 pixels 
 		{
 			chunkHeader++;
 			for (int i = 0; i < chunkHeader; i++)
@@ -164,7 +164,7 @@ bool TGAImage::LoadRLEData(std::ifstream& in)
 		}
 		else //chunk headers >= 128 indicates RLE-encoded chunks where the same color is repeated chunk header - 127 times
 		{
-			chunkHeader -= HALF_BITE_SIZE - 1;
+			chunkHeader -= MAX_CHUNK_LENGTH - 1;
 			in.read(reinterpret_cast<char*>(colorBuffer.Raw), bytesPerPixel);
 			if (!in.good())
 			{
@@ -262,5 +262,57 @@ bool TGAImage::WriteTGAFile(const std::string filename, bool rle)
 		return false;
 	}
 	out.close();
+	return true;
+}
+
+bool TGAImage::UnloadRLEData(std::ofstream& out)
+{
+	uint32_t pixelCount = width * height;
+	uint32_t currentPixel = 0;
+
+	while (currentPixel < pixelCount)
+	{
+		uint32_t chunkStart = currentPixel * bytesPerPixel;
+		uint32_t currentByte = currentPixel * bytesPerPixel;
+		uint8_t run_length = 1;
+		bool raw = true;
+
+		while (currentPixel + run_length < pixelCount && run_length < MAX_CHUNK_LENGTH)
+		{
+			bool nextPixelIsEqual = true;
+			for (int i = 0; nextPixelIsEqual && i < bytesPerPixel; i++)
+			{
+				nextPixelIsEqual = data[currentByte + i] == data[currentByte + i + bytesPerPixel];
+			}
+			currentByte += bytesPerPixel;
+			if (run_length == 1)
+			{
+				raw = !nextPixelIsEqual;
+			}
+			if (raw && nextPixelIsEqual)
+			{
+				run_length--;
+				break;
+			}
+			if (!raw && !nextPixelIsEqual)
+			{
+				break;
+			}
+			run_length++;
+		}
+		currentPixel += run_length;
+		out.put(raw ? run_length - 1 : run_length + (MAX_CHUNK_LENGTH - 1));
+		if (!out.good())
+		{
+			std::cerr << "Fail to unload RLE data \n";
+			return false;
+		}
+		out.write(reinterpret_cast<char*>(data.data() + chunkStart), raw ? run_length * bytesPerPixel : bytesPerPixel);
+		if (!out.good())
+		{
+			std::cerr << "Fail to unload RLE data \n";
+			return false;
+		}
+	}
 	return true;
 }
