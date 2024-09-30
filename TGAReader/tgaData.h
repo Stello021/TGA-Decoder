@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 
+#pragma pack(push,1)
 struct TGAHeader
 {
 	int8_t IdLength;
@@ -22,6 +23,7 @@ struct TGAHeader
 	//6th bit -> pixels ordered from top-to-bottom (1) or bottom-to-top (0)
 
 };
+#pragma pack(pop)
 
 struct TGAColor
 {
@@ -29,7 +31,7 @@ struct TGAColor
 	{
 		struct
 		{
-			uint8_t R, G, B, A;
+			uint8_t B, G, R, A; //little endian: channel are reversed
 		};
 		uint8_t Raw[4];
 		uint32_t Value;

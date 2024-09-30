@@ -61,7 +61,7 @@ public:
 	int GetHeigth() const;
 	int GetBytesPerPixel() const;
 
-	uint8_t* Buffer();
+	uint8_t* GetBuffer();
 	void Clear();
 
 
