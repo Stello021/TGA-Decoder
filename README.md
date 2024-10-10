@@ -1,4 +1,4 @@
-# TAG DECODER
+# TGA DECODER
 
 A simple C++ project that allows to decode and manipulate `.tga` file.
 
